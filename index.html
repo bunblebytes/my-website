@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            /* Prevent scrolling when button moves */
+            position: relative;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            z-index: 10;
+            /* Ensure card is above hearts */
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .emojis {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        h1 {
+            color: #d63384;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            /* Container for buttons */
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-yes {
+            background-color: #ff4d88;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 77, 136, 0.4);
+        }
+
+        .btn-yes:hover {
+            background-color: #e6005c;
+            transform: scale(1.05);
+        }
+
+        .btn-no {
+            background-color: white;
+            color: #888;
+            border: 2px solid #eee;
+        }
+
+        /* The "No" button needs to be absolute eventually, but can start relative.
+           We'll rely on JS to set position to absolute on first interaction. */
+        .btn-no.moving {
+            position: fixed;
+            /* Use fixed to move freely around screen */
+            z-index: 100;
+        }
+
+        .playful-text {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+        }
+
+        .success-message h1 {
+            color: #ff4d88;
+            font-size: 2.5rem;
+        }
+
+        .success-message p {
+            font-size: 1.2rem;
+            color: #555;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-20px);
+            }
+
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Heart Animation */
+        .heart {
+            position: absolute;
+            color: #ff4d88;
+            opacity: 0.6;
+            animation: floatUp linear infinite;
+            z-index: 1;
+            /* Behind the card */
+            pointer-events: none;
+            /* Let clicks pass through */
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateY(-10vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Initial Card -->
+        <div class="card" id="questionCard">
+            <div class="emojis">🐱💗</div>
+            <h1>Will you be my Valentine?</h1>
+
+            <div class="btn-group">
+                <button class="btn-yes" onclick="acceptValentine()">Yes 💕</button>
+                <button class="btn-no" id="noBtn" onmouseover="moveButton()" onclick="moveButton()">No</button>
+            </div>
+
+            <div class="playful-text">No is a little shy 😈</div>
+        </div>
+
+        <!-- Success Message (Hidden by default) -->
+        <div class="success-message" id="successMessage">
+            <div class="emojis">💖🐻💝</div>
+            <h1>Yay!</h1>
+            <p>Happy Valentine’s Day!</p>
+        </div>
+    </div>
+
+    <script>
+        function moveButton() {
+            const btn = document.getElementById('noBtn');
+
+            // Add 'moving' class to ensure it uses fixed positioning
+            if (!btn.classList.contains('moving')) {
+                btn.classList.add('moving');
+            }
+
+            // Calculate random position within the window
+            // Subtract button width/height to keep it fully visible
+            const maxX = window.innerWidth - btn.offsetWidth;
+            const maxY = window.innerHeight - btn.offsetHeight;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
+        }
+
+        function acceptValentine() {
+            const card = document.getElementById('questionCard');
+            const message = document.getElementById('successMessage');
+
+            card.style.display = 'none';
+            message.style.display = 'block';
+
+            // Burst of hearts on success
+            for (let i = 0; i < 30; i++) {
+                setTimeout(createHeart, i * 100);
+            }
+        }
+
+        // Background Hearts Animation
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤';
+
+            // Randomize position and size
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+
+            // Randomize animation duration for variety
+            const duration = Math.random() * 3 + 2; // between 2s and 5s
+            heart.style.animationDuration = duration + 's';
+
+            document.body.appendChild(heart);
+
+            // Remove heart after animation
+            setTimeout(() => {
+                heart.remove();
+            }, duration * 1000);
+        }
+
+        // Start creating hearts every 300ms
+        setInterval(createHeart, 300);
+
+    </script>
+</body>
+
+</html>
